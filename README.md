@@ -21,25 +21,37 @@ files/firstrun.ini
 files/serveroverrides.ini
 ```
 
+The repo now includes a local `.env` for machine-specific defaults, and `.env.example` as the tracked template. Edit `.env` for local paths, uid/gid, and startup behavior.
+
 You may need to create the necessary directories yourself, like in this case
 ```bash
 ~/games/FCE/
 ~/games/FCE_server/
 ```
 
+Relevant `.env` values:
+```bash
+FCE_DATA_DIR=~/games/FCE
+FCE_SERVER_DIR=~/games/FCE_server
+PUID=845
+PGID=845
+UPDATE_ON_START=true
+UPDATE_MODS_ON_START=true
+```
+
 To build the image: (in the same folder as docker-compose.yml)
 ```bash
-docker-compose build
+docker compose build
 ```
 
 To start it:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Or both commands in one: 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 
@@ -65,4 +77,3 @@ The necessary directories will be the following:
 ~/games/FCE/Worlds/
 ~/games/FCE/WorkshopMods/
 ```
-

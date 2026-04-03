@@ -1,4 +1,3 @@
-FROM frolvlad/alpine-glibc:alpine-3.12
 FROM steamcmd/steamcmd:latest
 
 LABEL maintainer="Dakes but not forever!"
@@ -23,14 +22,25 @@ ENV PORT=27012  \
     GROUP=FCE \
     HOME=/home/FCE
 
-RUN addgroup --gid "$PGID" --system "$GROUP" \
-    && adduser --uid "$PUID" --shell "/bin/sh" --system --ingroup $GROUP "$USER" \
-    && mkdir -p mkdir -p /opt/FCE \
-    && mkdir -p mkdir -p /FCE \
-    && chown -R "$USER":"$GROUP" /opt/FCE /FCE
-
-RUN chown -R "$USER":"$GROUP" /opt/FCE
-RUN chown -R "$USER":"$GROUP" /FCE
+RUN set -eux; \
+    if command -v groupadd >/dev/null 2>&1; then \
+        groupadd --gid "$PGID" --system "$GROUP"; \
+    elif command -v addgroup >/dev/null 2>&1; then \
+        addgroup --gid "$PGID" --system "$GROUP"; \
+    else \
+        echo "No supported group creation tool found" >&2; \
+        exit 1; \
+    fi; \
+    if command -v useradd >/dev/null 2>&1; then \
+        useradd --uid "$PUID" --shell "/bin/sh" --system --gid "$GROUP" --home-dir "$HOME" --create-home "$USER"; \
+    elif command -v adduser >/dev/null 2>&1; then \
+        adduser --uid "$PUID" --shell "/bin/sh" --system --ingroup "$GROUP" "$USER"; \
+    else \
+        echo "No supported user creation tool found" >&2; \
+        exit 1; \
+    fi; \
+    mkdir -p /opt/FCE /FCE "$HOME/.config/unity3d/ProjectorGames/FortressCraft" /opt/FCE/Default; \
+    chown -R "$USER":"$GROUP" /opt/FCE /FCE "$HOME"
 
 # Using the user caused problems, that I couldn't fix, so for now just use root. 
 # USER FCE

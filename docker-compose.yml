@@ -1,17 +1,21 @@
-version: '2'
 services:
   fce:
     build: .
+    restart: unless-stopped
     ports:
      - "27012:27012/udp" # game port
      - "27015:27015" # rcon (delete if you don't want to use rcon)
     volumes:
      # This the directory containing the world, config (.ini), mods and logs. 
-     - ~/games/FCE:/FCE
+     - ${FCE_DATA_DIR:-~/games/FCE}:/FCE
      # This is the Server directory, containing the executable. As well as firstrun.ini and serveroverrides.ini in /opt/FCE/Default
-     - ~/games/FCE_server:/opt/FCE
+     - ${FCE_SERVER_DIR:-~/games/FCE_server}:/opt/FCE
     environment:
-      #- PUID=1000
-      #- PGID=1000
-      - UPDATE_MODS_ON_START=true
-
+      PUID: ${PUID:-845}
+      PGID: ${PGID:-845}
+      PORT: 27012
+      RCON_PORT: 27015
+      BRANCH: linux-staging
+      STEAM_ID: 443600
+      UPDATE_ON_START: ${UPDATE_ON_START:-true}
+      UPDATE_MODS_ON_START: ${UPDATE_MODS_ON_START:-true}

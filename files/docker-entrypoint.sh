@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -eoux pipefail
+set -euxo pipefail
 
 FCE_VOL=/FCE
 LOAD_LATEST_SAVE="${LOAD_LATEST_SAVE:-true}"
@@ -10,9 +10,17 @@ mkdir -p "$FCE_VOL"
 mkdir -p "$SAVES"
 mkdir -p "$CONFIG"
 mkdir -p "$MODS"
+mkdir -p /opt/FCE/Default
 
-set -ox pipefail \
-    && steamcmd @ShutdownOnFailedCommand 1 + @NoPromptForPassword 1 +login anonymous +force_install_dir "/opt/FCE/" +app_update 443600 validate -beta linux-staging validate +quit
+if [[ "${UPDATE_ON_START:-true}" == "true" ]] || [[ ! -x /opt/FCE/FC_Linux_Universal.x86_64 ]]; then
+  steamcmd \
+    +@ShutdownOnFailedCommand 1 \
+    +@NoPromptForPassword 1 \
+    +force_install_dir /opt/FCE \
+    +login anonymous \
+    +app_update "$STEAM_ID" validate -beta "$BRANCH" \
+    +quit
+fi
 
 #if [[ ! -f $CONFIG/rconpw ]]; then
   # Generate a new RCON password if none exists
@@ -34,8 +42,8 @@ if [[ ! -f $CONFIG/serveroverrides.ini ]]; then
   echo "copying default serveroverrides.ini"
 fi
 
-cp $CONFIG/serveroverrides.ini /opt/FCE/Default/serveroverrides.ini
-cp $CONFIG/firstrun.ini /opt/FCE/Default/firstrun.ini
+cp "$CONFIG/serveroverrides.ini" /opt/FCE/Default/serveroverrides.ini
+cp "$CONFIG/firstrun.ini" /opt/FCE/Default/firstrun.ini
 
 
 #if [[ ${UPDATE_MODS_ON_START:-} == "true" ]]; then
@@ -44,15 +52,22 @@ cp $CONFIG/firstrun.ini /opt/FCE/Default/firstrun.ini
 
 
 if [[ $(id -u) = 0 ]]; then
-  # Update the User and Group ID based on the PUID/PGID variables
-  usermod -o -u "$PUID" FCE
-  groupmod -o -g "$PGID" FCE
+  # Best-effort UID/GID remap for compatibility across base images.
+  if command -v usermod >/dev/null 2>&1; then
+    usermod -o -u "$PUID" FCE
+  fi
+
+  if command -v groupmod >/dev/null 2>&1; then
+    groupmod -o -g "$PGID" FCE
+  fi
+
   # Take ownership of fce data if running as root
   chown -R FCE:FCE "$FCE_VOL"
-  # Drop to the fce user
-  SU_EXEC="su-exec FCE"
-else
-  SU_EXEC=""
+fi
+
+if [[ ! -x /opt/FCE/FC_Linux_Universal.x86_64 ]]; then
+  echo "FortressCraft server binary not found after SteamCMD install: /opt/FCE/FC_Linux_Universal.x86_64" >&2
+  exit 1
 fi
 
 
