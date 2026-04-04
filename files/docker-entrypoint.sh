@@ -46,9 +46,9 @@ cp "$CONFIG/serveroverrides.ini" /opt/FCE/Default/serveroverrides.ini
 cp "$CONFIG/firstrun.ini" /opt/FCE/Default/firstrun.ini
 
 
-#if [[ ${UPDATE_MODS_ON_START:-} == "true" ]]; then
-#  ./docker-update-mods.sh
-#fi
+if [[ "${UPDATE_MODS_ON_START:-false}" == "true" ]]; then
+  /docker-update-mods.sh
+fi
 
 
 if [[ $(id -u) = 0 ]]; then

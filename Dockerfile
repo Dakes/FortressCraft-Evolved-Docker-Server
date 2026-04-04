@@ -59,6 +59,7 @@ RUN mkdir -p $HOME/.config/ \
 
 
 COPY files/*.sh /
+RUN chmod +x /docker-entrypoint.sh /docker-update-mods.sh
 COPY files/serveroverrides.ini $CONFIG/
 COPY files/firstrun.ini $CONFIG/
 COPY files/serveroverrides.ini /

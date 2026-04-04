@@ -39,6 +39,12 @@ UPDATE_ON_START=true
 UPDATE_MODS_ON_START=true
 ```
 
+Automatic mod updates use the numeric directory names already present in `WorkshopMods/` as workshop item IDs. If `UPDATE_MODS_ON_START=true`, the container refreshes each of those items before launching the server.
+
+FortressCraft workshop downloads do not appear to work anonymously. For automatic mod updates, set `STEAM_USERNAME` and `STEAM_PASSWORD` in your local `.env` for a Steam account that owns the base game. Otherwise set `UPDATE_MODS_ON_START=false` to avoid repeated failed update attempts.
+
+If Steam Guard Mobile is enabled, SteamCMD will ask you to approve the login in the Steam app. The updater performs one Steam login per startup and stores SteamCMD auth/cache data under `/FCE/.steamcmd` so the approval can be reused across container recreates instead of prompting once per mod.
+
 To build the image: (in the same folder as docker-compose.yml)
 ```bash
 docker compose build
