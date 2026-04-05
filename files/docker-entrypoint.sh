@@ -50,21 +50,6 @@ if [[ "${UPDATE_MODS_ON_START:-false}" == "true" ]]; then
   /docker-update-mods.sh
 fi
 
-
-if [[ $(id -u) = 0 ]]; then
-  # Best-effort UID/GID remap for compatibility across base images.
-  if command -v usermod >/dev/null 2>&1; then
-    usermod -o -u "$PUID" FCE
-  fi
-
-  if command -v groupmod >/dev/null 2>&1; then
-    groupmod -o -g "$PGID" FCE
-  fi
-
-  # Take ownership of fce data if running as root
-  chown -R FCE:FCE "$FCE_VOL"
-fi
-
 if [[ ! -x /opt/FCE/FC_Linux_Universal.x86_64 ]]; then
   echo "FortressCraft server binary not found after SteamCMD install: /opt/FCE/FC_Linux_Universal.x86_64" >&2
   exit 1

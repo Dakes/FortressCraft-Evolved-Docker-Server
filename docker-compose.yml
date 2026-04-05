@@ -11,8 +11,6 @@ services:
      # This is the Server directory, containing the executable. As well as firstrun.ini and serveroverrides.ini in /opt/FCE/Default
      - ${FCE_SERVER_DIR:-~/games/FCE_server}:/opt/FCE
     environment:
-      PUID: ${PUID:-845}
-      PGID: ${PGID:-845}
       PORT: 27012
       RCON_PORT: 27015
       BRANCH: linux-staging

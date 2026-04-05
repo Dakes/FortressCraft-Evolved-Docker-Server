@@ -21,7 +21,7 @@ files/firstrun.ini
 files/serveroverrides.ini
 ```
 
-The repo now includes a local `.env` for machine-specific defaults, and `.env.example` as the tracked template. Edit `.env` for local paths, uid/gid, and startup behavior.
+The repo now includes a local `.env` for machine-specific defaults. Edit `.env` for local paths and startup behavior.
 
 You may need to create the necessary directories yourself, like in this case
 ```bash
@@ -33,8 +33,6 @@ Relevant `.env` values:
 ```bash
 FCE_DATA_DIR=~/games/FCE
 FCE_SERVER_DIR=~/games/FCE_server
-PUID=845
-PGID=845
 UPDATE_ON_START=true
 UPDATE_MODS_ON_START=true
 ```
