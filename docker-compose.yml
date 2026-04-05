@@ -3,16 +3,16 @@ services:
     build: .
     restart: unless-stopped
     ports:
-     - "27012:27012/udp" # game port
-     - "27015:27015" # rcon (delete if you don't want to use rcon)
+     - "${GAME_PORT:-27012}:${GAME_PORT:-27012}/udp" # game port
+     - "${RCON_PORT:-27015}:${RCON_PORT:-27015}" # rcon (delete if you don't want to use rcon)
     volumes:
      # This the directory containing the world, config (.ini), mods and logs. 
      - ${FCE_DATA_DIR:-~/games/FCE}:/FCE
      # This is the Server directory, containing the executable. As well as firstrun.ini and serveroverrides.ini in /opt/FCE/Default
      - ${FCE_SERVER_DIR:-~/games/FCE_server}:/opt/FCE
     environment:
-      PORT: 27012
-      RCON_PORT: 27015
+      PORT: ${GAME_PORT:-27012}
+      RCON_PORT: ${RCON_PORT:-27015}
       BRANCH: linux-staging
       STEAM_ID: 443600
       STEAM_USERNAME: ${STEAM_USERNAME:-}

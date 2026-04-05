@@ -42,6 +42,9 @@ if [[ ! -f $CONFIG/serveroverrides.ini ]]; then
   echo "copying default serveroverrides.ini"
 fi
 
+sed -i "s/^RCONPort = .*/RCONPort = ${RCON_PORT}/" "$CONFIG/serveroverrides.ini"
+sed -i "s/^ServerPort = .*/ServerPort = ${PORT}/" "$CONFIG/serveroverrides.ini"
+
 cp "$CONFIG/serveroverrides.ini" /opt/FCE/Default/serveroverrides.ini
 cp "$CONFIG/firstrun.ini" /opt/FCE/Default/firstrun.ini
 

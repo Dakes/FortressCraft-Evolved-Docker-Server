@@ -33,9 +33,13 @@ Relevant `.env` values:
 ```bash
 FCE_DATA_DIR=~/games/FCE
 FCE_SERVER_DIR=~/games/FCE_server
+GAME_PORT=27012
+RCON_PORT=27015
 UPDATE_ON_START=true
 UPDATE_MODS_ON_START=true
 ```
+
+`GAME_PORT` and `RCON_PORT` are the single source of truth for port configuration. The compose port mapping and the generated `serveroverrides.ini` values are both derived from those `.env` entries.
 
 Automatic mod updates use the numeric directory names already present in `WorkshopMods/` as workshop item IDs. If `UPDATE_MODS_ON_START=true`, the container refreshes each of those items before launching the server.
 
