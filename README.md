@@ -21,25 +21,45 @@ files/firstrun.ini
 files/serveroverrides.ini
 ```
 
+The repo now includes a local `.env` for machine-specific defaults. Edit `.env` for local paths and startup behavior.
+
 You may need to create the necessary directories yourself, like in this case
 ```bash
 ~/games/FCE/
 ~/games/FCE_server/
 ```
 
+Relevant `.env` values:
+```bash
+FCE_DATA_DIR=~/games/FCE
+FCE_SERVER_DIR=~/games/FCE_server
+GAME_PORT=27012
+RCON_PORT=27015
+UPDATE_ON_START=true
+UPDATE_MODS_ON_START=true
+```
+
+`GAME_PORT` and `RCON_PORT` are the single source of truth for port configuration. The compose port mapping and the generated `serveroverrides.ini` values are both derived from those `.env` entries.
+
+Automatic mod updates use the numeric directory names already present in `WorkshopMods/` as workshop item IDs. If `UPDATE_MODS_ON_START=true`, the container refreshes each of those items before launching the server.
+
+FortressCraft workshop downloads do not appear to work anonymously. For automatic mod updates, set `STEAM_USERNAME` and `STEAM_PASSWORD` in your local `.env` for a Steam account that owns the base game. Otherwise set `UPDATE_MODS_ON_START=false` to avoid repeated failed update attempts.
+
+If Steam Guard Mobile is enabled, SteamCMD will ask you to approve the login in the Steam app. The updater performs one Steam login per startup and stores SteamCMD auth/cache data under `/FCE/.steamcmd` so the approval can be reused across container recreates instead of prompting once per mod.
+
 To build the image: (in the same folder as docker-compose.yml)
 ```bash
-docker-compose build
+docker compose build
 ```
 
 To start it:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Or both commands in one: 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 
@@ -65,4 +85,3 @@ The necessary directories will be the following:
 ~/games/FCE/Worlds/
 ~/games/FCE/WorkshopMods/
 ```
-
