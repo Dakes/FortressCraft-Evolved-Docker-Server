@@ -59,6 +59,49 @@ if [[ ! -x /opt/FCE/FC_Linux_Universal.x86_64 ]]; then
 fi
 
 
-#sed -i '/write-data=/c\write-data=\/FCE/' /opt/FCE/config/config.ini
+# ... existing SteamCMD and config setup ...
+
+# Ensure the log file exists for tailing
+touch /FCE/Player.log
+tail -f /FCE/Player.log &
+TAIL_PID=$!
+
 cd /opt/FCE/
-./FC_Linux_Universal.x86_64 -batchmode
+./FC_Linux_Universal.x86_64 -batchmode &
+FCE_PID=$!
+
+# Function to handle graceful shutdown
+graceful_shutdown() {
+    echo "Sending shutdown command (FCQuit) to FCE server..."
+    # Extract RCON password from config, default to 'Password'
+    RCON_PASS=$(grep -i "^RCONPassword" "$CONFIG/serveroverrides.ini" | cut -d'=' -f2 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' || echo "Password")
+    
+    # Create a temporary config for rconclt
+    cat <<EOF > /tmp/rcon.conf
+[fce]
+host = 127.0.0.1
+port = ${RCON_PORT}
+passwd = ${RCON_PASS:-Password}
+EOF
+
+    # Use rconclt with the temporary config
+    # We use '|| true' because FCE often closes the connection before rconclt finishes,
+    # and we don't want the script to exit before the server finishes saving.
+    rconclt -t 15 -c /tmp/rcon.conf fce "FCQuit" || echo "Note: rconclt timed out, but command was sent."
+    
+    rm /tmp/rcon.conf
+    echo "Waiting for FCE server to finish saving and exit..."
+    wait "$FCE_PID"
+    echo "FCE server has stopped gracefully. Exiting."
+    exit 0
+}
+
+# Trap SIGTERM (sent by docker stop/down)
+trap 'graceful_shutdown' SIGTERM SIGINT
+
+# Wait for the server process to exit
+wait "$FCE_PID"
+echo "FCE server has stopped."
+
+# Clean up tailing process
+kill "$TAIL_PID" || true

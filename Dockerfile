@@ -1,5 +1,8 @@
 FROM steamcmd/steamcmd:latest
 
+# Install rcon package from Ubuntu Universe
+RUN apt-get update && apt-get install -y rcon && rm -rf /var/lib/apt/lists/*
+
 ENV PORT=27012  \
     RCON_PORT=27015  \
     BRANCH=linux-staging \
