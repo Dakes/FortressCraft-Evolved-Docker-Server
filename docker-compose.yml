@@ -2,12 +2,12 @@ services:
   fce:
     build: .
     restart: unless-stopped
-    stop_grace_period: 1m
+    stop_grace_period: 10m
     ports:
      - "${GAME_PORT:-27012}:${GAME_PORT:-27012}/udp" # game port
      - "${RCON_PORT:-27015}:${RCON_PORT:-27015}" # rcon (delete if you don't want to use rcon)
     volumes:
-     # This the directory containing the world, config (.ini), mods and logs. 
+     # This the directory containing the world, config (.ini), mods and logs.
      - ${FCE_DATA_DIR:-~/games/FCE}:/FCE
      # This is the Server directory, containing the executable. As well as firstrun.ini and serveroverrides.ini in /opt/FCE/Default
      - ${FCE_SERVER_DIR:-~/games/FCE_server}:/opt/FCE

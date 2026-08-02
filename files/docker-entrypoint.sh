@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 
 FCE_VOL=/FCE
 LOAD_LATEST_SAVE="${LOAD_LATEST_SAVE:-true}"
@@ -75,7 +75,7 @@ graceful_shutdown() {
     echo "Sending shutdown command (FCQuit) to FCE server..."
     # Extract RCON password from config, default to 'Password'
     RCON_PASS=$(grep -i "^RCONPassword" "$CONFIG/serveroverrides.ini" | cut -d'=' -f2 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' || echo "Password")
-    
+
     # Create a temporary config for rconclt
     cat <<EOF > /tmp/rcon.conf
 [fce]
@@ -88,7 +88,7 @@ EOF
     # We use '|| true' because FCE often closes the connection before rconclt finishes,
     # and we don't want the script to exit before the server finishes saving.
     rconclt -t 15 -c /tmp/rcon.conf fce "FCQuit" || echo "Note: rconclt timed out, but command was sent."
-    
+
     rm /tmp/rcon.conf
     echo "Waiting for FCE server to finish saving and exit..."
     wait "$FCE_PID"
